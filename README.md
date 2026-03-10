@@ -13,10 +13,13 @@ This repository provides a **Microservices Stack** designed to deploy a high-per
 
 This project is **heavily based** on the excellent work by **9M2PJU** in his [9M2PJU-DXSpider-Docker](https://github.com/9M2PJU/dxspider.git) repository. It has been customized, optimized for Alpine 3.20, and expanded to include a full MariaDB/Nginx stack.
 
+The web interface is powered by **[Spiderweb](https://github.com/coulisse/spiderweb/)**, an open-source DX Cluster web frontend developed by **IU1BOW - Corrado Gerbaldo**.
+
 The deployment consists of four main interconnected components running within an isolated internal network:
 
 1.  **DXSpider Node (Mojo):** The core cluster engine, optimized for asynchronous processes and low latency.
 2.  **MariaDB 10.11:** Relational database engine for persistent storage of users, spots, and node configuration.
-3.  **WebUI (ttyd/Mojo Web):** A tactical web-based interface for remote administration and monitoring via browser.
-4.  **NGINX Reverse Proxy:** Acts as a secure gateway, managing HTTP/Websocket traffic to the WebUI and providing an additional layer of protection.
+3.  **Spiderweb (IU1BOW):** A feature-rich web frontend for DX Cluster, displaying live spots, statistics, charts and propagation data. Developed by [IU1BOW - Corrado Gerbaldo](https://github.com/coulisse/spiderweb/).
+4.  **WebUI (ttyd/Mojo Web):** A tactical web-based interface for remote administration and monitoring via browser.
+5.  **NGINX Reverse Proxy:** Acts as a secure gateway, managing HTTP/Websocket traffic to the WebUI and providing an additional layer of protection.
 
