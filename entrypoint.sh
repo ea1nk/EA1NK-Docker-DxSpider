@@ -21,6 +21,8 @@ EOF
 CLUSTER_CALLSIGN=$(echo ${CLUSTER_CALLSIGN} | tr '[a-z]' '[A-Z]')
 CLUSTER_SYSOP_CALLSIGN=$(echo ${CLUSTER_SYSOP_CALLSIGN} | tr '[a-z]' '[A-Z]')
 CLUSTER_LOCATOR=$(echo ${CLUSTER_LOCATOR} | tr '[a-z]' '[A-Z]')
+CLUSTER_SPIDERWEB_USER=$(echo ${CLUSTER_SPIDERWEB_USER:-SPIDERWEBUSER} | tr '[a-z]' '[A-Z]')
+CLUSTER_SPIDERWEB_PASSWORD=${CLUSTER_SPIDERWEB_PASSWORD:-SPIDERWEBPASSWORD}
 
 # escape e-mail addresses to avoid Perl warnings
 CLUSTER_SYSOP_EMAIL=$(echo ${CLUSTER_SYSOP_EMAIL} | sed 's/\@/\\\\@/g')
@@ -52,6 +54,12 @@ sed -i "/\$Internet::contest_host/s/'//g" ${SPIDER_INSTALL_DIR}/local/DXVars.pm
 
 # Mojo has another lck file location
 [ -f ${SPIDER_INSTALL_DIR}/local_data/cluster.lck ] && rm -f ${SPIDER_INSTALL_DIR}/local_data/cluster.lck
+
+# Replace startup placeholders for Spiderweb telnet user credentials.
+if [ -f ${SPIDER_INSTALL_DIR}/scripts/startup ]; then
+    sed -i "s/SPIDERWEBUSER/${CLUSTER_SPIDERWEB_USER}/g" ${SPIDER_INSTALL_DIR}/scripts/startup
+    sed -i "s/SPIDERWEBPASSWORD/${CLUSTER_SPIDERWEB_PASSWORD}/g" ${SPIDER_INSTALL_DIR}/scripts/startup
+fi
 
 
 cd ${SPIDER_INSTALL_DIR}/perl && \

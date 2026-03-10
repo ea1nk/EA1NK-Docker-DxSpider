@@ -4,3 +4,8 @@ connect ed1zac-5
 set/var $Internet::allow = 1
 set/var $Internet::contest_host = "contest.dxtron.com"
 set/var $main::reqreg = 1 # user must register to use spot function !!
+
+# Spiderweb service user for telnet API access
+set/password SPIDERWEBUSER SPIDERWEBPASSWORD
+set/isolate SPIDERWEBUSER
+spoof SPIDERWEBUSER set/name Spiderweb

@@ -32,6 +32,8 @@ services:
       - CLUSTER_DBPASS=${CLUSTER_DB_PASS}
       - CLUSTER_PORT=${CLUSTER_PORT}
       - CLUSTER_SYSOP_PORT=${CLUSTER_SYSOP_PORT}
+      - CLUSTER_SPIDERWEB_USER=${CLUSTER_SPIDERWEB_USER}
+      - CLUSTER_SPIDERWEB_PASSWORD=${CLUSTER_SPIDERWEB_PASSWORD}
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "${CLUSTER_PORT}"]
       interval: 10s
@@ -87,7 +89,26 @@ services:
       depends_on:
         - dxspider
   web_server:
-    image: nginx:alpine
+    build:
+      context: .
+      dockerfile: web_server/Dockerfile
     container_name: dxspider-webui
-    volumes:
-     - ./web_content:/usr/share/nginx/html:ro
+    restart: always
+    depends_on:
+      spider_database:
+        condition: service_healthy
+      dxspider:
+        condition: service_started
+    environment:
+      - SPIDERWEB_DB_HOST=spider_database
+      - SPIDERWEB_DB_USER=${CLUSTER_DB_USER}
+      - SPIDERWEB_DB_PASS=${CLUSTER_DB_PASS}
+      - SPIDERWEB_DB_NAME=${CLUSTER_DB_NAME}
+      - SPIDERWEB_MYCALLSIGN=${CLUSTER_CALLSIGN}
+      - SPIDERWEB_MAIL=${CLUSTER_SYSOP_EMAIL}
+      - SPIDERWEB_TELNET_HOST=dxspider-node
+      - SPIDERWEB_TELNET_PORT=${CLUSTER_PORT}
+      - SPIDERWEB_TELNET_USER=${CLUSTER_SPIDERWEB_USER}
+      - SPIDERWEB_TELNET_PASSWORD=${CLUSTER_SPIDERWEB_PASSWORD}
+    expose:
+      - "8080"
