@@ -13,7 +13,7 @@
 ███████╗██║  ██║ ██║██║ ╚████║██║  ██╗           
 2026 EA1NK-Docker-DXSpider High-Performance DX Cluster Stack with WebUI, MariaDB & Nginx
 ```
-# 📂 EA1NK-Docker-DXSpider 
+# 🐳 EA1NK-Docker-DXSpider 
 ### High-Performance DX Cluster Stack with WebUI, MariaDB & Nginx
 
 [![Docker](https://img.shields.io/badge/Docker-24.0+-blue?logo=docker)](https://www.docker.com/)
