@@ -1,5 +1,6 @@
 0,5,10,20,30,40,50 * * * * start_connect('ed1zac-5') unless connected('ed1zac-5')
-
+0,5,10,20,30,40,50 * * * * start_connect('sk0mmr') unless connected('sk0mmr')
+0,5,10,20,30,40,50 * * * * start_connect('sk1mmr') unless connected('sk1mmr')
 # badip
 30 * * * * spawn('cd /spider/local_data; wget -qN https://github.com/EA3CV/dxspider_info/blob/main/download/badip.torexit')
 30 * * * * spawn('cd /spider/local_data; wget -qN https://github.com/EA3CV/dxspider_info/blob/main/download/badip.torrelay')

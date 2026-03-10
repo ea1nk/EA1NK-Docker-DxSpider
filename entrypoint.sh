@@ -55,11 +55,28 @@ sed -i "/\$Internet::contest_host/s/'//g" ${SPIDER_INSTALL_DIR}/local/DXVars.pm
 # Mojo has another lck file location
 [ -f ${SPIDER_INSTALL_DIR}/local_data/cluster.lck ] && rm -f ${SPIDER_INSTALL_DIR}/local_data/cluster.lck
 
+# Replace placeholders in bind-mounted files without using sed -i.
+replace_in_file() {
+    local file="$1"
+    local search="$2"
+    local replace="$3"
+
+    [ -f "$file" ] || return 0
+
+    # Avoid in-place editing because bind mounts can fail with "Resource busy".
+    tmp_file=$(mktemp)
+    sed "s/${search}/${replace}/g" "$file" > "$tmp_file" && cat "$tmp_file" > "$file"
+    rm -f "$tmp_file"
+}
+
 # Replace startup placeholders for Spiderweb telnet user credentials.
-if [ -f ${SPIDER_INSTALL_DIR}/scripts/startup ]; then
-    sed -i "s/SPIDERWEBUSER/${CLUSTER_SPIDERWEB_USER}/g" ${SPIDER_INSTALL_DIR}/scripts/startup
-    sed -i "s/SPIDERWEBPASSWORD/${CLUSTER_SPIDERWEB_PASSWORD}/g" ${SPIDER_INSTALL_DIR}/scripts/startup
-fi
+replace_in_file "${SPIDER_INSTALL_DIR}/scripts/startup" "SPIDERWEBUSER" "${CLUSTER_SPIDERWEB_USER}"
+replace_in_file "${SPIDER_INSTALL_DIR}/scripts/startup" "SPIDERWEBPASSWORD" "${CLUSTER_SPIDERWEB_PASSWORD}"
+
+# Replace connect file placeholders for dynamic RBN login callsign.
+replace_in_file "${SPIDER_INSTALL_DIR}/connect/rbn" "RBNCALLSIGN" "${CLUSTER_CALLSIGN}"
+replace_in_file "${SPIDER_INSTALL_DIR}/connect/sk0mmr" "RBNCALLSIGN" "${CLUSTER_CALLSIGN}"
+replace_in_file "${SPIDER_INSTALL_DIR}/connect/sk1mmr" "RBNCALLSIGN" "${CLUSTER_CALLSIGN}"
 
 
 cd ${SPIDER_INSTALL_DIR}/perl && \

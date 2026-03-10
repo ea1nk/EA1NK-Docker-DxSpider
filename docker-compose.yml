@@ -48,7 +48,6 @@ services:
       - ./motd:/spider/local_data/motd:rw
       - ./motd_nor:/spider/local_data/motd_nor:rw
       - ./local_data:/spider/local_data:rw
-      - ./cmd:/spider/cmd:rw
       - ./msg:/spider/msg:rw
     ports:
       - "${CLUSTER_PORT}:${CLUSTER_PORT}"
