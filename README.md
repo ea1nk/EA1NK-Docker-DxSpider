@@ -9,7 +9,9 @@ This repository provides a **Microservices Stack** designed to deploy a high-per
 
 ---
 
-## 🏗️ Stack Architecture
+## 🏗️ Stack Architecture & Credits
+
+This project is **heavily based** on the excellent work by **9M2PJU** in his [9M2PJU-DXSpider-Docker](https://github.com/9M2PJU/dxspider.git) repository. It has been customized, optimized for Alpine 3.20, and expanded to include a full MariaDB/Nginx stack.
 
 The deployment consists of four main interconnected components running within an isolated internal network:
 
