@@ -30,6 +30,8 @@ Este proyecto esta **fuertemente basado** en el excelente trabajo de **9M2PJU** 
 
 La interfaz web esta impulsada por **[Spiderweb](https://github.com/coulisse/spiderweb/)**, un frontend web de DX Cluster de codigo abierto desarrollado por **IU1BOW - Corrado Gerbaldo**.
 
+Este proyecto aplica parches locales sobre la interfaz Spiderweb durante la construccion de la imagen, a partir de los ficheros almacenados en `web_server/patches/`. Estos parches se usan cuando hace falta adaptar el comportamiento o la presentacion de Spiderweb a este stack.
+
 El despliegue se compone de cinco servicios principales interconectados dentro de una red interna aislada:
 
 1. **DXSpider Node (Mojo):** Motor principal del cluster, optimizado para procesos asincronos y baja latencia.
