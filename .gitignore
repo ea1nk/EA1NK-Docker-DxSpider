@@ -15,8 +15,6 @@ nginx/logs/
 # macOS metadata
 .DS_Store
 
-cmd/*
-!cmd/.gitkeep
 assets/*
 !assets/.gitkeep
 local_cmd/*
