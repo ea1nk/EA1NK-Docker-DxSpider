@@ -1,3 +1,6 @@
+# Fichero de configuración local con credenciales reales (nunca subir al repositorio)
+.env
+
 # Runtime MariaDB files (host-mounted volume)
 database_data/*
 !database_data/.gitkeep
