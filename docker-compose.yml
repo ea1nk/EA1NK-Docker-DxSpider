@@ -73,3 +73,16 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+  nginx:
+      image: nginx:alpine
+      container_name: dxspider-proxy
+      restart: always
+      ports:
+        - "80:80"   # Puerto HTTP estándar
+        - "443:443" # Para futuro SSL
+      volumes:
+        - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./nginx/conf.d:/etc/nginx/conf.d:ro
+        - ./nginx/logs:/var/log/nginx
+      depends_on:
+        - dxspider
