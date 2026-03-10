@@ -86,3 +86,8 @@ services:
         - ./nginx/logs:/var/log/nginx
       depends_on:
         - dxspider
+  web_server:
+    image: nginx:alpine
+    container_name: dxspider-webui
+    volumes:
+     - ./web_content:/usr/share/nginx/html:ro
