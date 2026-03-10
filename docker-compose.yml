@@ -13,7 +13,7 @@ services:
     privileged: true
     container_name: dxspider-node
     depends_on:
-      db:
+      spider_database:
         condition: service_healthy
     environment:
       - SPIDER_INSTALL_DIR=/spider
@@ -57,7 +57,7 @@ services:
         max-size: "200k"
         max-file: "10"
 
-  db:  
+  spider_database:  
     image: mariadb:10.11
     container_name: dxspider-db
     restart: always
