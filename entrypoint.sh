@@ -72,6 +72,7 @@ replace_in_file() {
 # Replace startup placeholders for Spiderweb telnet user credentials.
 replace_in_file "${SPIDER_INSTALL_DIR}/scripts/startup" "SPIDERWEBUSER" "${CLUSTER_SPIDERWEB_USER}"
 replace_in_file "${SPIDER_INSTALL_DIR}/scripts/startup" "SPIDERWEBPASSWORD" "${CLUSTER_SPIDERWEB_PASSWORD}"
+replace_in_file "${SPIDER_INSTALL_DIR}/scripts/startup" "SYSOPCALLSIGN" "${CLUSTER_SYSOP_CALLSIGN}"
 
 # Replace connect file placeholders for dynamic RBN login callsign.
 replace_in_file "${SPIDER_INSTALL_DIR}/connect/rbn" "RBNCALLSIGN" "${CLUSTER_CALLSIGN}"
