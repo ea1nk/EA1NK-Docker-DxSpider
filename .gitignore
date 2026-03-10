@@ -1,0 +1,19 @@
+# Runtime MariaDB files (host-mounted volume)
+database_data/
+
+# Runtime DXSpider data files (host-mounted volume)
+local_data/
+
+# Runtime nginx logs
+nginx/logs/
+
+# Local editor settings
+.vscode/
+
+# macOS metadata
+.DS_Store
+
+cmd/
+assets/
+local_cmd/
+msg/
