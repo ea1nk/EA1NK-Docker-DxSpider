@@ -1,8 +1,10 @@
 # Runtime MariaDB files (host-mounted volume)
-database_data/
+database_data/*
+!database_data/.gitkeep
 
 # Runtime DXSpider data files (host-mounted volume)
-local_data/
+local_data/*
+!local_data/.gitkeep
 
 # Runtime nginx logs
 nginx/logs/
@@ -13,7 +15,13 @@ nginx/logs/
 # macOS metadata
 .DS_Store
 
-cmd/
-assets/
-local_cmd/
-msg/
+cmd/*
+!cmd/.gitkeep
+assets/*
+!assets/.gitkeep
+local_cmd/*
+!local_cmd/.gitkeep
+msg/*
+!msg/.gitkeep
+web_content/*
+!web_content/.gitkeep
