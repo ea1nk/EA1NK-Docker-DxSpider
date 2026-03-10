@@ -35,7 +35,7 @@ Este proyecto aplica parches locales sobre la interfaz Spiderweb durante la cons
 El despliegue se compone de cinco servicios principales interconectados dentro de una red interna aislada:
 
 1. **DXSpider Node (Mojo):** Motor principal del cluster, optimizado para procesos asincronos y baja latencia.
-2. **MariaDB 10.11:** Motor de base de datos relacional para almacenamiento persistente de usuarios, spots y configuracion del nodo.
+2. **MariaDB 10.11:** Motor de base de datos relacional para almacenamiento persistente de spots.
 3. **Spiderweb (IU1BOW):** Frontend web para DX Cluster con spots en vivo, estadisticas, graficas y datos de propagacion.
 4. **WebUI (ttyd/Mojo Web):** Interfaz web para administracion remota del sysop desde navegador.
 5. **Nginx Reverse Proxy:** Pasarela de entrada para trafico HTTP/WebSocket hacia las interfaces web.
