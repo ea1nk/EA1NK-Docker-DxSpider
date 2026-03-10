@@ -1,6 +1,7 @@
 FROM alpine:3.20
 
 # Argumentos de construcción
+# ARG SPIDER_GIT_REPOSITORY=git://scm.dxcluster.org/scm/spider
 ARG SPIDER_GIT_REPOSITORY=https://github.com/9M2PJU/dxspider.git
 ARG SPIDER_VERSION=mojo
 ARG SPIDER_INSTALL_DIR=/spider
