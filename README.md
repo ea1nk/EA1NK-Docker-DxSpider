@@ -32,13 +32,14 @@ The web interface is powered by **[Spiderweb](https://github.com/coulisse/spider
 
 This project applies local patches to the Spiderweb interface during the image build process from the files stored in `web_server/patches/`. These patches are used to adapt Spiderweb behavior and presentation to this stack when needed.
 
-The deployment consists of four main interconnected components running within an isolated internal network:
+The deployment consists of six interconnected components running within an isolated internal network:
 
 1.  **DXSpider Node (Mojo):** The core cluster engine, optimized for asynchronous processes and low latency.
 2.  **MariaDB 10.11:** Relational database engine for persistent storage of spots.
 3.  **Spiderweb (IU1BOW):** A feature-rich web frontend for DX Cluster, displaying live spots, statistics, charts and propagation data. Developed by [IU1BOW - Corrado Gerbaldo](https://github.com/coulisse/spiderweb/).
 4.  **WebUI (ttyd/Mojo Web):** A tactical web-based interface for remote sysop administration and monitoring via browser.
 5.  **NGINX Reverse Proxy:** Acts as a secure gateway, managing HTTP/Websocket traffic to the WebUI and providing an additional layer of protection.
+6.  **Telegram Bot (optional profile):** Reads live spots from DXSpider and sends filtered alerts to Telegram users. It also supports `/last` queries against MariaDB.
 
 ---
 
@@ -93,6 +94,16 @@ CLUSTER_DB_NAME=spiderdb
 # Spiderweb internal telnet user (auto-created)
 CLUSTER_SPIDERWEB_USER=SPIDERWEBUSER
 CLUSTER_SPIDERWEB_PASSWORD=change_me_web
+
+# Telegram Bot (optional)
+TELEGRAM_BOT_TOKEN=your_telegram_bot_token
+MY_CALL=MYCALL-BOT
+DEBUG_TELNET=0
+PYTHONUNBUFFERED=1
+# Optional override (defaults to spider_database in compose)
+CLUSTER_DB_HOST=spider_database
+# Enable optional compose profile
+COMPOSE_PROFILES=telegram_bot
 ```
 
 > **Note:** `CLUSTER_SPIDERWEB_USER` and `CLUSTER_SPIDERWEB_PASSWORD` are created automatically in DXSpider at startup — you don't need to create them manually.
@@ -111,7 +122,7 @@ The first run will build the DXSpider and Spiderweb images. This may take a few 
 docker compose ps
 ```
 
-All four services should show `Up` or `Up (healthy)`.
+Core services should show `Up` or `Up (healthy)`. If Telegram profile is enabled, `dxspider-telegram-bot` should also be `Up`.
 
 ### 5. Access the web interface
 
@@ -132,5 +143,34 @@ docker compose up -d
 ```
 
 > **Data persistence:** All spot data and user configuration is stored in `./database_data/` (MariaDB volume) and `./local_data/` (DXSpider config). These directories are excluded from git.
+
+### 7. Telegram Bot integration (optional)
+
+The Telegram bot is included as the `telegram_bot` profile in `docker-compose.yml`.
+
+Start stack with Telegram profile enabled:
+
+```bash
+docker compose --profile telegram_bot up -d --build
+```
+
+Or keep `COMPOSE_PROFILES=telegram_bot` in `.env` and run the normal command:
+
+```bash
+docker compose up -d --build
+```
+
+Check bot logs:
+
+```bash
+docker compose logs -f telegram_bot
+```
+
+Notes:
+
+- The bot token must be provided in `.env` as `TELEGRAM_BOT_TOKEN`.
+- `/last` requires MariaDB access variables (`CLUSTER_DB_NAME`, `CLUSTER_DB_USER`, `CLUSTER_DB_PASS`, and optional `CLUSTER_DB_HOST`).
+- The integrated bot supports both DXSpider table schemas (`spots` and legacy `spot`) for `/last` compatibility.
+- Full bot command and filter documentation is available in `telegram_bot/README.md`.
 
 
