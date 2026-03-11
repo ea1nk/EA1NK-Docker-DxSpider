@@ -9,6 +9,10 @@ database_data/*
 local_data/*
 !local_data/.gitkeep
 
+# Runtime Telegram bot SQLite files
+telegrambot_data/*.db
+telegrambot_data/*.db-*
+
 # Runtime nginx logs
 nginx/logs/
 

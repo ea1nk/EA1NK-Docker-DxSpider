@@ -139,3 +139,5 @@ services:
       - CLUSTER_DB_PASS=${CLUSTER_DB_PASS}
       # Otras variables que necesite el bot (ej. del sysop)
       - SYSOP_CALLSIGN=${CLUSTER_SYSOP_CALLSIGN}
+    volumes:
+      - ./telegrambot_data:/app/data
