@@ -111,3 +111,31 @@ services:
       - SPIDERWEB_TELNET_PASSWORD=${CLUSTER_SPIDERWEB_PASSWORD}
     expose:
       - "8080"
+  telegram_bot:
+    profiles:
+      - telegram_bot
+    build:
+      # Asumiendo que has clonado el repo en una carpeta llamada 'bot'
+      context: ./telegram_bot 
+      dockerfile: Dockerfile
+    container_name: dxspider-telegram-bot
+    restart: always
+    depends_on:
+      dxspider:
+        condition: service_healthy
+    environment:
+      # Conexión al nodo DxSpider
+      - SPIDER_HOST=dxspider-node
+      - SPIDER_PORT=${CLUSTER_PORT}
+      - MY_CALL=${MY_CALL}
+      - DEBUG_TELNET=${DEBUG_TELNET:-0}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
+      # Credenciales del Bot (tomadas de tu .env)
+      - BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      # Base de datos para comando /last
+      - CLUSTER_DB_HOST=${CLUSTER_DB_HOST:-spider_database}
+      - CLUSTER_DB_NAME=${CLUSTER_DB_NAME}
+      - CLUSTER_DB_USER=${CLUSTER_DB_USER}
+      - CLUSTER_DB_PASS=${CLUSTER_DB_PASS}
+      # Otras variables que necesite el bot (ej. del sysop)
+      - SYSOP_CALLSIGN=${CLUSTER_SYSOP_CALLSIGN}
