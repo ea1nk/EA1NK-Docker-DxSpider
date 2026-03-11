@@ -17,7 +17,7 @@
 ### High-Performance DX Cluster Stack with WebUI, MariaDB & Nginx
 
 [![Docker](https://img.shields.io/badge/Docker-24.0+-blue?logo=docker)](https://www.docker.com/)
-[![License](https://img.shields.io/badge/License-GPL--2.0-red.svg)](https://opensource.org/licenses/GPL-2.0)
+[![License](https://img.shields.io/badge/License-GPL--3.0-red.svg)](https://opensource.org/licenses/GPL-3.0)
 [![Platform](https://img.shields.io/badge/Platform-Linux%20(amd64/arm64)-orange)](https://www.debian.org)
 
 This repository provides a **Microservices Stack** designed to deploy a high-performance **DXSpider** node (Mojo branch), fully containerized and production-ready.
