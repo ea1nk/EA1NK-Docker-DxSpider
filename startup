@@ -1,9 +1,14 @@
 load/forward
 set/spider ed1zac-5
 connect ed1zac-5
+
+# Start of skimmer connections
+# Comment all this block if RBN spots are not wanted.
 set/rbn sk0mmr sk1mmr
 connect sk0mmr
 connect sk1mmr
+# End of skimmer connections
+
 set/var $Internet::allow = 1
 set/var $Internet::contest_host = "contest.dxtron.com"
 set/var $main::reqreg = 1 # user must register to use spot function !!
