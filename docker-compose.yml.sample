@@ -1,0 +1,141 @@
+name: ea1nk-dxspider
+services:
+  dxspider:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      platforms:
+        - "linux/arm64"
+        - "linux/amd64"
+      args:
+        - SPIDER_VERSION=${CLUSTER_DXSPIDER_BRANCH}
+        - SPIDER_USERNAME=${CLUSTER_DB_USER}
+    privileged: true
+    container_name: dxspider-node
+    depends_on:
+      spider_database:
+        condition: service_healthy
+    environment:
+      - SPIDER_INSTALL_DIR=/spider
+      - CLUSTER_CALLSIGN=${CLUSTER_CALLSIGN}
+      - CLUSTER_LOCATOR=${CLUSTER_LOCATOR}
+      - CLUSTER_QTH=${CLUSTER_QTH}
+      - CLUSTER_SYSOP_NAME=${CLUSTER_SYSOP_NAME}
+      - CLUSTER_SYSOP_CALLSIGN=${CLUSTER_SYSOP_CALLSIGN}
+      - CLUSTER_SYSOP_EMAIL=${CLUSTER_SYSOP_EMAIL}
+      - CLUSTER_SYSOP_BBS_ADDRESS=${CLUSTER_SYSOP_BBS_ADDRESS}
+      - CLUSTER_LATITUDE=${CLUSTER_LATITUDE}
+      - CLUSTER_LONGITUDE=${CLUSTER_LONGITUDE}
+      - SPIDER_USERNAME=${CLUSTER_DB_USER}
+      - CLUSTER_DSN=dbi:mysql:${CLUSTER_DB_NAME}:${CLUSTER_DB_HOSTNAME}:${CLUSTER_DB_PORT}
+      - CLUSTER_DBUSER=${CLUSTER_DB_USER}
+      - CLUSTER_DBPASS=${CLUSTER_DB_PASS}
+      - CLUSTER_PORT=${CLUSTER_PORT}
+      - CLUSTER_SYSOP_PORT=${CLUSTER_SYSOP_PORT}
+      - CLUSTER_SPIDERWEB_USER=${CLUSTER_SPIDERWEB_USER}
+      - CLUSTER_SPIDERWEB_PASSWORD=${CLUSTER_SPIDERWEB_PASSWORD}
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "${CLUSTER_PORT}"]
+      interval: 10s
+      start_period: 10s
+      retries: 3
+      timeout: 5s
+    restart: always
+    volumes:
+      - ./startup:/spider/scripts/startup:rw
+      - ./crontab:/spider/local_cmd/crontab:rw
+      - ./connect:/spider/connect:rw
+      - ./motd:/spider/local_data/motd:rw
+      - ./motd_nor:/spider/local_data/motd_nor:rw
+      - ./local_data:/spider/local_data:rw
+      - ./msg:/spider/msg:rw
+    ports:
+      - "${CLUSTER_PORT}:${CLUSTER_PORT}"
+      - "${CLUSTER_SYSOP_PORT}:${CLUSTER_SYSOP_PORT}"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "200k"
+        max-file: "10"
+
+  spider_database:  
+    image: mariadb:10.11
+    container_name: dxspider-db
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${CLUSTER_DB_NAME}
+      MYSQL_USER: ${CLUSTER_DB_USER}
+      MYSQL_PASSWORD: ${CLUSTER_DB_PASS}
+      MYSQL_ROOT_PASSWORD: ${CLUSTER_DB_ROOT_PASSWORD:-rootpassword}
+    volumes:
+      - ./database_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  nginx:
+      image: nginx:alpine
+      container_name: dxspider-proxy
+      restart: always
+      ports:
+        - "80:80"   # Puerto HTTP estándar
+        - "443:443" # Para futuro SSL
+      volumes:
+        - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+        - ./nginx/conf.d:/etc/nginx/conf.d:ro
+        - ./nginx/logs:/var/log/nginx
+      depends_on:
+        - dxspider
+  web_server:
+    build:
+      context: .
+      dockerfile: web_server/Dockerfile
+    container_name: dxspider-webui
+    restart: always
+    depends_on:
+      spider_database:
+        condition: service_healthy
+      dxspider:
+        condition: service_started
+    environment:
+      - SPIDERWEB_DB_HOST=spider_database
+      - SPIDERWEB_DB_USER=${CLUSTER_DB_USER}
+      - SPIDERWEB_DB_PASS=${CLUSTER_DB_PASS}
+      - SPIDERWEB_DB_NAME=${CLUSTER_DB_NAME}
+      - SPIDERWEB_MYCALLSIGN=${CLUSTER_CALLSIGN}
+      - SPIDERWEB_MAIL=${CLUSTER_SYSOP_EMAIL}
+      - SPIDERWEB_TELNET_HOST=dxspider-node
+      - SPIDERWEB_TELNET_PORT=${CLUSTER_PORT}
+      - SPIDERWEB_TELNET_USER=${CLUSTER_SPIDERWEB_USER}
+      - SPIDERWEB_TELNET_PASSWORD=${CLUSTER_SPIDERWEB_PASSWORD}
+    expose:
+      - "8080"
+  telegram_bot:
+    profiles:
+      - telegram_bot
+    build:
+      # Asumiendo que has clonado el repo en una carpeta llamada 'bot'
+      context: ./telegram_bot 
+      dockerfile: Dockerfile
+    container_name: dxspider-telegram-bot
+    restart: always
+    depends_on:
+      dxspider:
+        condition: service_healthy
+    environment:
+      # Conexión al nodo DxSpider
+      - SPIDER_HOST=dxspider-node
+      - SPIDER_PORT=${CLUSTER_PORT}
+      - MY_CALL=${MY_CALL}
+      - DEBUG_TELNET=${DEBUG_TELNET:-0}
+      - PYTHONUNBUFFERED=${PYTHONUNBUFFERED:-1}
+      # Credenciales del Bot (tomadas de tu .env)
+      - BOT_TOKEN=${TELEGRAM_BOT_TOKEN}
+      # Base de datos para comando /last
+      - CLUSTER_DB_HOST=${CLUSTER_DB_HOST:-spider_database}
+      - CLUSTER_DB_NAME=${CLUSTER_DB_NAME}
+      - CLUSTER_DB_USER=${CLUSTER_DB_USER}
+      - CLUSTER_DB_PASS=${CLUSTER_DB_PASS}
+      # Otras variables que necesite el bot (ej. del sysop)
+      - SYSOP_CALLSIGN=${CLUSTER_SYSOP_CALLSIGN}
