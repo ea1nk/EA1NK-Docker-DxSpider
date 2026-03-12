@@ -1,3 +1,4 @@
 [submodule "telegram_bot"]
 	path = telegram_bot
 	url = https://github.com/ea1nk/EA1NK-DxSpider-TelegramBOT
+	branch=main
