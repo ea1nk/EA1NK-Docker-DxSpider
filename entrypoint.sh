@@ -1,3 +1,4 @@
+#!/bin/bash
 # Added ttyd for sysop console over web
 # Add configuration update for mysql / mariadb connection
 
@@ -80,12 +81,25 @@ replace_in_file "${SPIDER_INSTALL_DIR}/connect/sk0mmr" "RBNCALLSIGN" "${CLUSTER_
 replace_in_file "${SPIDER_INSTALL_DIR}/connect/sk1mmr" "RBNCALLSIGN" "${CLUSTER_CALLSIGN}"
 
 
-cd ${SPIDER_INSTALL_DIR}/perl && \
+cd ${SPIDER_INSTALL_DIR}/perl || exit 1
 if [ ! -s ${SPIDER_INSTALL_DIR}/local_data/users.v3j ]; then
     ./create_sysop.pl
-fi && \
+fi
+
 ./cluster.pl &
+CLUSTER_PID=$!
 
 sleep 3
 
-ttyd -p ${CLUSTER_SYSOP_PORT} -u 1000 -t fontSize=16 -c ${CLUSTER_DBUSER}:${CLUSTER_DBPASS} perl /spider/perl/console.pl
+ttyd -p ${CLUSTER_SYSOP_PORT} -u 1000 -t fontSize=16 -c ${CLUSTER_DBUSER}:${CLUSTER_DBPASS} perl /spider/perl/console.pl &
+TTYD_PID=$!
+
+# Forward docker stop signals so cluster.pl can shut down cleanly.
+trap 'kill -TERM ${CLUSTER_PID} ${TTYD_PID} 2>/dev/null' TERM INT
+
+# Exit as soon as either process dies so "restart: always" brings the node back.
+wait -n ${CLUSTER_PID} ${TTYD_PID}
+EXIT_CODE=$?
+kill -TERM ${CLUSTER_PID} ${TTYD_PID} 2>/dev/null
+wait
+exit ${EXIT_CODE}

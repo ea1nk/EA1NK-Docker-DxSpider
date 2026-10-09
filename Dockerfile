@@ -9,7 +9,7 @@ ARG SPIDER_USERNAME=sysop
 ARG SPIDER_UID=1000
 
 # 1. Instalación de dependencias y compilación
-RUN apk update && apk add --no-cache \
+RUN apk add --no-cache \
     # Herramientas de sistema y runtime
     git \
     nano \
@@ -58,7 +58,7 @@ RUN apk update && apk add --no-cache \
     && chown -R ${SPIDER_USERNAME}:${SPIDER_USERNAME} ${SPIDER_INSTALL_DIR} \
     # Limpieza para reducir tamaño de imagen
     && apk del .build-deps \
-    && rm -rf /var/cache/apk/* /root/.cpanm
+    && rm -rf /root/.cpanm
 
 # 2. Configuración de archivos (Solo si no usas volúmenes externos para esto)
 # Nota: Si usas volúmenes en docker-compose, estos COPY se sobrescribirán al arrancar.
@@ -72,8 +72,7 @@ COPY --chown=${SPIDER_USERNAME}:${SPIDER_USERNAME} startup ${SPIDER_INSTALL_DIR}
 COPY --chown=${SPIDER_USERNAME}:${SPIDER_USERNAME} crontab ${SPIDER_INSTALL_DIR}/local_cmd/
 
 # 3. Script de entrada y permisos finales
-COPY entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
+COPY --chmod=755 entrypoint.sh /entrypoint.sh
 
 # Cambiamos al usuario sysop para seguridad
 USER ${SPIDER_USERNAME}
@@ -81,4 +80,4 @@ USER ${SPIDER_USERNAME}
 # Exponemos los puertos típicos (ajustables vía ENV en el compose)
 EXPOSE 7300 8000
 
-ENTRYPOINT ["/bin/sh", "/entrypoint.sh"]
+ENTRYPOINT ["/bin/bash", "/entrypoint.sh"]

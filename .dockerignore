@@ -1,0 +1,23 @@
+# Contexto de build mínimo: solo lo que copian Dockerfile y web_server/Dockerfile
+.git
+.gitignore
+.gitmodules
+.vscode
+.env
+.env.*
+*.md
+LICENSE
+docker-compose.yml*
+
+# Datos de runtime (volúmenes montados desde el host)
+database_data
+local_data
+local_cmd
+msg
+assets
+web_content
+nginx
+telegrambot_data
+
+# El bot tiene su propio contexto de build (./telegram_bot)
+telegram_bot

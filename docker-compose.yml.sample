@@ -1,16 +1,21 @@
 name: ea1nk-dxspider
+
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "200k"
+    max-file: "10"
+
 services:
   dxspider:
     build:
       context: .
       dockerfile: Dockerfile
-      platforms:
-        - "linux/arm64"
-        - "linux/amd64"
       args:
         - SPIDER_VERSION=${CLUSTER_DXSPIDER_BRANCH}
         - SPIDER_USERNAME=${CLUSTER_DB_USER}
-    privileged: true
+    init: true
+    stop_grace_period: 30s
     container_name: dxspider-node
     depends_on:
       spider_database:
@@ -37,7 +42,7 @@ services:
     healthcheck:
       test: ["CMD", "nc", "-z", "localhost", "${CLUSTER_PORT}"]
       interval: 10s
-      start_period: 10s
+      start_period: 60s
       retries: 3
       timeout: 5s
     restart: always
@@ -52,11 +57,7 @@ services:
     ports:
       - "${CLUSTER_PORT}:${CLUSTER_PORT}"
       - "${CLUSTER_SYSOP_PORT}:${CLUSTER_SYSOP_PORT}"
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "200k"
-        max-file: "10"
+    logging: *default-logging
 
   spider_database:  
     image: mariadb:10.11
@@ -74,6 +75,7 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    logging: *default-logging
   nginx:
       image: nginx:alpine
       container_name: dxspider-proxy
@@ -86,7 +88,11 @@ services:
         - ./nginx/conf.d:/etc/nginx/conf.d:ro
         - ./nginx/logs:/var/log/nginx
       depends_on:
-        - dxspider
+        dxspider:
+          condition: service_healthy
+        web_server:
+          condition: service_started
+      logging: *default-logging
   web_server:
     build:
       context: .
@@ -97,7 +103,7 @@ services:
       spider_database:
         condition: service_healthy
       dxspider:
-        condition: service_started
+        condition: service_healthy
     environment:
       - SPIDERWEB_DB_HOST=spider_database
       - SPIDERWEB_DB_USER=${CLUSTER_DB_USER}
@@ -111,6 +117,7 @@ services:
       - SPIDERWEB_TELNET_PASSWORD=${CLUSTER_SPIDERWEB_PASSWORD}
     expose:
       - "8080"
+    logging: *default-logging
   telegram_bot:
     profiles:
       - telegram_bot
@@ -123,6 +130,9 @@ services:
     depends_on:
       dxspider:
         condition: service_healthy
+      spider_database:
+        condition: service_healthy
+    logging: *default-logging
     environment:
       # Conexión al nodo DxSpider
       - SPIDER_HOST=dxspider-node

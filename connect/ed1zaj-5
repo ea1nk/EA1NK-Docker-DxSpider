@@ -1,0 +1,3 @@
+timeout 15
+connect telnet 44.31.192.212 8000
+'login:' 'ea1nk-5'
